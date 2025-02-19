@@ -81,7 +81,6 @@ public class ApiService {
 
     private String makeApiPostRequest(String urlString, String jsonBody) throws IOException{
         URL url = new URL(urlString);
-        String apiKey = "5b3ce3597851110001cf6248c84c30d1924a4ae29356faabcb01dddf";
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Authorization", API_KEY);
