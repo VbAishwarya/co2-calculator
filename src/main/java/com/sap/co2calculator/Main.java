@@ -3,12 +3,14 @@ package com.sap.co2calculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
+
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) {
         logger.info("Application started");
-
+        DecimalFormat df = new DecimalFormat("#.#");
         CliParser cliParser = new CliParser(args);
 
         if(!cliParser.isValid()){
@@ -28,12 +30,12 @@ public class Main {
         double distance = apiService.getDistance(startCity, endCity);
 
         if(distance != -1) {
-            System.out.println("Distance between " + startCity + "and" + endCity + ": " + distance + "km");
+            System.out.println("Distance between " + startCity + "and" + endCity + ": " + df.format(distance) + "km");
 
             Co2Calculator co2Calculator = new Co2Calculator();
             System.out.println("Your trip from " + startCity + " to " + endCity + " using " + transportMethod + " is being calculated...");
             double co2Emission = co2Calculator.calculateEmission(distance, transportMethod);
-            System.out.println("Your trip caused " + co2Emission + "kg of CO2-equivalent.");
+            System.out.println("Your trip caused " + df.format(co2Emission) + "kg of CO2-equivalent.");
         }else {
             System.out.println("Error: Could not fetch distance.");
         }

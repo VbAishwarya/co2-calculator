@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 
 public class ApiService {
@@ -18,8 +21,8 @@ public class ApiService {
     public double[] getCoordinates(String cityName){
         try{
             logger.info("Fetching coordinates for city: {}", cityName);
-
-            String urlString = "https://api.openrouteservice.org/geocode/search?api_key=" + API_KEY + "&text=" + cityName + "&layers=locality";
+            String encodedCity = URLEncoder.encode(cityName, StandardCharsets.UTF_8);
+            String urlString = "https://api.openrouteservice.org/geocode/search?api_key=" + API_KEY + "&text=" + encodedCity + "&layers=locality";
             String response = makeApiGetRequest(urlString);
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -40,7 +43,7 @@ public class ApiService {
     public double getDistance(String city1, String city2){
         try{
             logger.info("Fetching distance between {} and {}", city1, city2);
-
+            DecimalFormat df = new DecimalFormat("#.#");
             double[] coords1 = getCoordinates(city1);
             double[] coords2 = getCoordinates(city2);
 
@@ -62,7 +65,7 @@ public class ApiService {
             double distanceInMeters = jsonNode.get("distances").get(0).get(1).asDouble();
             double distanceInKm = distanceInMeters / 1000.0;
 
-            logger.info("Distance between {} and {}: {} km", city1, city2, distanceInKm);
+            logger.info("Distance between {} and {}: {} km", city1, city2, df.format(distanceInKm));
             return distanceInKm;
         } catch (Exception e){
             logger.error("Error fetching distance between {} and {}: {}", city1, city2, e.getMessage());
