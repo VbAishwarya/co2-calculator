@@ -1,0 +1,14 @@
+# Use an official JDK runtime as the base image
+FROM eclipse-temurin:21-jdk
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the JAR file into the container
+COPY target/co2-calculator-1.0-SNAPSHOT.jar co2-calculator.jar
+
+# Expose the port your app runs on (replace 8080 if different)
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "/app/co2-calculator.jar"]
