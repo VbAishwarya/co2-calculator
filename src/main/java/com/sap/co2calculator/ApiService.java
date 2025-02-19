@@ -2,6 +2,9 @@ package com.sap.co2calculator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sap.co2calculator.DTO.CoordinatesDTO;
+import com.sap.co2calculator.DTO.DistanceRequestDTO;
+import com.sap.co2calculator.DTO.DistanceResponseDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +14,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class ApiService {
@@ -18,7 +22,7 @@ public class ApiService {
     private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
     private static final String API_KEY = System.getenv("ORS_TOKEN");
 
-    public double[] getCoordinates(String cityName){
+    public CoordinatesDTO getCoordinates(String cityName){
         try{
             logger.info("Fetching coordinates for city: {}", cityName);
             String encodedCity = URLEncoder.encode(cityName, StandardCharsets.UTF_8);
@@ -33,43 +37,46 @@ public class ApiService {
             double latitude = coordinates.get(1).asDouble();
 
             logger.info("Coordinates for {}: Longitude={}, Latitude={}", cityName, longitude, latitude);
-            return new double[]{longitude, latitude};
+            return new CoordinatesDTO(longitude, latitude);
         } catch (Exception e){
             logger.error("Error fetching coordinates for {}: {}", cityName, e.getMessage());
             return null;
         }
     }
 
-    public double getDistance(String city1, String city2){
+    public DistanceResponseDTO getDistance(String startCity, String endCity){
         try{
-            logger.info("Fetching distance between {} and {}", city1, city2);
+            logger.info("Fetching distance between {} and {}", startCity, endCity);
             DecimalFormat df = new DecimalFormat("#.#");
-            double[] coords1 = getCoordinates(city1);
-            double[] coords2 = getCoordinates(city2);
+            CoordinatesDTO startCityCoords = getCoordinates(startCity);
+            CoordinatesDTO endCityCoords = getCoordinates(endCity);
 
-            if(coords1 == null || coords2 == null){
+            if(startCityCoords == null || endCityCoords == null){
                 logger.error("Error: One or both city coordinates could not be retrieved.");
-                return -1;
+                return null;
             }
 
-            String requestBody = "{ \"locations\": ["
-                    + "[" + coords1[0] + "," + coords1[1] + "],"
-                    + "[" + coords2[0] + "," + coords2[1] + "]"
-                    + "], \"metrics\": [\"distance\"] }";
-
-            String response = makeApiPostRequest("https://api.openrouteservice.org/v2/matrix/driving-car", requestBody);
+            DistanceRequestDTO requestDTO = new DistanceRequestDTO(
+                    Arrays.asList(
+                            Arrays.asList(startCityCoords.getLongitude(), startCityCoords.getLatitude()),
+                            Arrays.asList(endCityCoords.getLongitude(), endCityCoords.getLatitude())
+                    )
+            );
 
             ObjectMapper objectMapper = new ObjectMapper();
+            String requestBody = objectMapper.writeValueAsString(requestDTO);
+
+            String response = makeApiPostRequest("https://api.openrouteservice.org/v2/matrix/driving-car", requestBody);
             JsonNode jsonNode = objectMapper.readTree(response);
 
             double distanceInMeters = jsonNode.get("distances").get(0).get(1).asDouble();
             double distanceInKm = distanceInMeters / 1000.0;
 
-            logger.info("Distance between {} and {}: {} km", city1, city2, df.format(distanceInKm));
-            return distanceInKm;
+            logger.info("Distance between {} and {}: {} km", startCity, endCity, df.format(distanceInKm));
+            return new DistanceResponseDTO(distanceInKm);
         } catch (Exception e){
-            logger.error("Error fetching distance between {} and {}: {}", city1, city2, e.getMessage());
-            return -1;
+            logger.error("Error fetching distance between {} and {}: {}", startCity, endCity, e.getMessage());
+            return null;
         }
     }
 
