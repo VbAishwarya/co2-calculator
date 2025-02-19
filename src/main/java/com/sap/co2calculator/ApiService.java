@@ -13,7 +13,7 @@ import java.util.Scanner;
 public class ApiService {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiService.class);
-    private static final String API_KEY = "5b3ce3597851110001cf6248c84c30d1924a4ae29356faabcb01dddf";
+    private static final String API_KEY = System.getenv("ORS_TOKEN");
 
     public double[] getCoordinates(String cityName){
         try{
@@ -84,7 +84,7 @@ public class ApiService {
         String apiKey = "5b3ce3597851110001cf6248c84c30d1924a4ae29356faabcb01dddf";
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
-        connection.setRequestProperty("Authorization", apiKey);
+        connection.setRequestProperty("Authorization", API_KEY);
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
 
