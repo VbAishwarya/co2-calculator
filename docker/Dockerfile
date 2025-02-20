@@ -5,7 +5,7 @@ FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
 # Copy the JAR file into the container
-COPY target/co2-calculator-1.0-SNAPSHOT.jar co2-calculator.jar
+COPY ../target/co2-calculator-1.0-SNAPSHOT.jar co2-calculator.jar
 
 # Expose the port your app runs on (replace 8080 if different)
 EXPOSE 8080
