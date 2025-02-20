@@ -14,6 +14,7 @@ This tool supports **Maven for dependency management** and can be **Dockerized f
 - ✅ Allows flexible CLI arguments (`--key value` and `--key=value` formats).
 - ✅ Uses **Maven for dependency management**.
 - ✅ Includes **unit tests** for all components.
+- ✅ Supports **Windows Batch & Shell scripts** for easier execution.
 - ✅ Can be **Dockerized for easier execution**.
 
 ---
@@ -45,36 +46,56 @@ Before running the tool, ensure you have:
    cd co2-calculator
 
 2. Set Up Environment Variables (For OpenRouteService API Key)
+   
    ```bash
    export ORS_TOKEN="your_api_key_here"   # Linux/macOS
    set ORS_TOKEN="your_api_key_here"      # Windows (CMD)
    $env:ORS_TOKEN="your_api_key_here"     # Windows (PowerShell)
 
-3. Build the Project
+3. Build the Project with Maven
    ```bash   
    mvn clean package
 
-✅ If successful, the JAR file will be in the target/ directory.
+- If successful, the JAR file will be in the target/ directory.
+   ```bash
+   target/co2-calculator-1.0-SNAPSHOT.jar
 
 ## Running the CLI Tool
 
-- Run the tool using:
-   ```bash  
-   java -jar target/co2-calculator-1.0-SNAPSHOT.jar --start Hamburg 
-   --end Berlin --transportation-method diesel-car-medium
-
-- Example Output
+- Option 1: Run Directly Using Java
    ```bash 
-   Distance between Hamburg and Berlin: 289.0 km
-   Your trip caused 49.2 kg of CO2-equivalent.
+  java -jar target/co2-calculator-1.0-SNAPSHOT.jar --start "Los Angeles" --end "New York" --transportation-method diesel-car-medium
 
-- Alternative CLI Syntax
+- Option 2: Run Using Windows Batch File (co2-calculator.bat)
    ```bash 
-  Supports both --key value and --key=value formats: 
-  java -jar target/co2-calculator-1.0-SNAPSHOT.jar --start=Hamburg 
-  --end Berlin --transportation-method=diesel-car-medium
+  ./co2-calculator --end "New York" --start "Los Angeles" --transportation-method=electric-car-large
 
+- Option 3: Run Using Linux/macOS Shell Script (co2-calculator.sh)
+   ```bash 
+    ./co2-calculator.sh --end "New York" --start "Los Angeles" --transportation-method petrol-car-medium
+  
 ## Running with Docker (Optional)
-
+    
 Instead of installing Java and Maven, you can run the tool inside a Docker container.
+ 
+- Build the Docker Image
+   ```bash 
+  docker build -t co2-calculator .
 
+- Run the Tool in Docker
+   ```bash 
+    docker run --rm -e ORS_TOKEN="your_api_key_here" co2-calculator --start "Los Angeles" --end "New York" --transportation-method diesel-car-medium
+
+## Running Tests
+
+- To verify correctness, run:
+   ```bash 
+    mvn test
+
+- For test coverage, run:
+   ```bash 
+    mvn jacoco:report
+
+The coverage report will be generated at:
+   ```bash 
+    target/site/jacoco/index.html
