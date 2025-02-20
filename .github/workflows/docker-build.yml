@@ -46,10 +46,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # Build and Tag Docker Image
-      - name: Build Docker Image
+      - name: 🛠️ Build Docker Image
         run: |
+          ls -la  # Debugging step: List files in the working directory
           docker build -t ${{ secrets.DOCKER_USERNAME }}/co2-calculator:latest .
-          docker tag ${{ secrets.DOCKER_USERNAME }}/co2-calculator:latest ${{ secrets.DOCKER_USERNAME }}/co2-calculator:${{ github.run_number }}
 
       # Push Docker Image to Docker Hub
       - name: Push Docker Image to Docker Hub
