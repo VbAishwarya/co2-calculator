@@ -6,6 +6,7 @@ import com.sap.co2calculator.DTO.DistanceResponseDTO;
 import com.sap.co2calculator.Exception.ApiRequestException;
 import com.sap.co2calculator.Exception.InvalidCityException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -22,8 +23,14 @@ public class ApiServiceTest {
 
     @BeforeEach
     void setUp() {
-        apiServiceSpy = Mockito.spy(new ApiService()); // Create a spy instance
+        System.setProperty("ORS_TOKEN", "mocked-api-key");
+        apiServiceSpy = Mockito.spy(new ApiService());
         objectMapper = new ObjectMapper();
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.clearProperty("ORS_TOKEN");
     }
 
     @Test
