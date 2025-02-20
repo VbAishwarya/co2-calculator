@@ -129,7 +129,7 @@ public class ApiService {
 
             } catch (InterruptedException e) {
                 logger.error("Thread interrupted during sleep: {}", e.getMessage());
-                Thread.currentThread().interrupt(); // Restore the interrupted status
+                Thread.currentThread().interrupt();
                 throw new IOException("API request interrupted.");
             } catch (IOException e) {
                 if (attempt == maxRetries) {
@@ -138,7 +138,7 @@ public class ApiService {
                 logger.warn("API request failed (attempt {}/{}): {}", attempt, maxRetries, e.getMessage());
                 try {
                     Thread.sleep(retryDelay);
-                    retryDelay *= 2; // Exponential backoff
+                    retryDelay *= 2;
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 }

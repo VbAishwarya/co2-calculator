@@ -47,7 +47,7 @@ public class ApiServiceTest {
     }
 
     @Test
-    void testGetCoordinatesInvalidCity() throws IOException, InvalidCityException, ApiRequestException {
+    void testGetCoordinatesInvalidCity() throws IOException {
         String jsonResponse = """
                 {
                     "features": []
@@ -77,7 +77,7 @@ public class ApiServiceTest {
     }
 
     @Test
-    void testGetDistanceApiFailure() throws IOException, InvalidCityException, ApiRequestException {
+    void testGetDistanceApiFailure() throws InvalidCityException, ApiRequestException {
         when(apiServiceSpy.getDistance("Los Angeles", "New York")).thenThrow(new ApiRequestException("API Error"));
 
         Exception exception = assertThrows(ApiRequestException.class, () -> apiServiceSpy.getDistance("Los Angeles", "New York"));
