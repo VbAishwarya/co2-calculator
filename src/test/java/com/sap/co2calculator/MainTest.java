@@ -1,5 +1,8 @@
 package com.sap.co2calculator;
 import com.sap.co2calculator.DTO.DistanceResponseDTO;
+import com.sap.co2calculator.Exception.ApiRequestException;
+import com.sap.co2calculator.Exception.CalculationException;
+import com.sap.co2calculator.Exception.InvalidCityException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +22,7 @@ public class MainTest {
     }
 
     @Test
-    void testValidExecution() {
+    void testValidExecution() throws ApiRequestException, InvalidCityException, CalculationException {
         when(apiServiceMock.getDistance("Los Angeles", "New York")).thenReturn(new DistanceResponseDTO(4500.3));
         when(co2CalculatorMock.calculateEmission(4500.3, "petrol-car-medium")).thenReturn(770.4);
 
@@ -38,7 +41,7 @@ public class MainTest {
     }
 
     @Test
-    void testApiFailure() {
+    void testApiFailure() throws ApiRequestException, InvalidCityException {
         when(apiServiceMock.getDistance("Los Angeles", "New York")).thenReturn(null);
 
         String[] args = {"--start=Los Angeles", "--end=New York", "--transportation-method=petrol-car-medium"};

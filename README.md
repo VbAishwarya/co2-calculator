@@ -96,6 +96,23 @@ Instead of installing Java and Maven, you can run the tool inside a Docker conta
    ```bash 
     mvn jacoco:report
 
-The coverage report will be generated at:
+- The coverage report will be generated at:
    ```bash 
     target/site/jacoco/index.html
+  
+## Edge Cases Handled & Debugging Insights
+
+✅ Edge Cases & Fixes
+
+| Category              | Test Case                     | Error Encountered          | Fix Implemented                                                |
+|-----------------------|-------------------------------|----------------------------|----------------------------------------------------------------|
+| 1. Input Validation   | Missing Arguments             | CLI Tool crashes           | Shows usage message instead of crashing                        |
+|                       | Invalid city name             | API request fails with 400 | Throws InvalidCityException with a clear message               |
+|                       | Invalid transportation method | CO2 Calculation fails      | Throws CalculationException                                    |
+| 2. API Failures       | API key missing               | 403 Forbidden error        | Throws ApiRequestException                                     |
+|                       | API returns 504 timeout       | Request fails              | Retries 3 times with exponential backoff                       |
+|                       | API returns invalid response  | JSON parsing fails         | Throws ApiRequestExceptiom                                     |
+| 3. Calculation Errors | CO2 emission is negative      | Impossible Scenario        | Added validation in Co2Calculator, throws CalculationException
+
+
+

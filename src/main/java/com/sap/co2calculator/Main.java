@@ -1,6 +1,9 @@
 package com.sap.co2calculator;
 
 import com.sap.co2calculator.DTO.DistanceResponseDTO;
+import com.sap.co2calculator.Exception.ApiRequestException;
+import com.sap.co2calculator.Exception.CalculationException;
+import com.sap.co2calculator.Exception.InvalidCityException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,16 +35,29 @@ public class Main {
         String transportMethod = cliParser.getTransportMethod();
 
         logger.info("User input: Start={} End={} Transport={}", startCity, endCity, transportMethod);
+        try {
+            DistanceResponseDTO distanceDTO = apiService.getDistance(startCity, endCity);
+            if (distanceDTO == null) {
+                return "Error: Could not fetch distance.";
+            }
 
-        DistanceResponseDTO distanceDTO = apiService.getDistance(startCity, endCity);
-        if (distanceDTO == null) {
-            return "Error: Could not fetch distance.";
+            double distance = distanceDTO.getDistanceKm();
+            double co2Emission = co2Calculator.calculateEmission(distance, transportMethod);
+            System.out.println("Distance: " + df.format(distance) + " km, CO2 Emission: " + df.format(co2Emission) + " kg");
+            return "Your trip caused " + df.format(co2Emission) + " kg of CO2-equivalent. ";
+        } catch (InvalidCityException e) {
+            logger.error("Invalid city error: {}", e.getMessage());
+            return "Error: " + e.getMessage();
+        } catch (ApiRequestException e) {
+            logger.error("API error: {}", e.getMessage());
+            return "Error: API request failed after retries. " + e.getMessage();
+        } catch (CalculationException e) {
+            logger.error("Calculation error: {}", e.getMessage());
+            return "Error: " + e.getMessage();
+        } catch (Exception e) {
+            logger.error("Unexpected error: {}", e.getMessage());
+            return "Error: An unexpected error occurred.";
         }
-
-        double distance = distanceDTO.getDistanceKm(); // Now safe to call
-        double co2Emission = co2Calculator.calculateEmission(distance, transportMethod);
-        System.out.println("Distance: " + df.format(distance) + " km, CO2 Emission: " + df.format(co2Emission) + " kg");
-        return "Your trip caused " + df.format(co2Emission) + " kg of CO2-equivalent. ";
     }
 
     public static void main(String[] args) {

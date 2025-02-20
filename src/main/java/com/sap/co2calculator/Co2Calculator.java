@@ -1,5 +1,7 @@
 package com.sap.co2calculator;
 
+import com.sap.co2calculator.Exception.CalculationException;
+
 import java.util.Map;
 
 public class Co2Calculator {
@@ -21,8 +23,23 @@ public class Co2Calculator {
             Map.entry("train-default", 6.0)
     );
 
-    public double calculateEmission(double distance, String method){
-        double emissionFactor = CO2_EMISSIONS.getOrDefault(method, 0.0);
-        return (distance * emissionFactor) / 1000;
+    public double calculateEmission(double distance, String transportMethod) throws CalculationException {
+        Double emissionFactor = CO2_EMISSIONS.get(transportMethod);
+
+        if (emissionFactor == null) {
+            throw new CalculationException("Invalid transportation method: " + transportMethod);
+        }
+        if (distance < 0) {
+            throw new CalculationException("Invalid distance: " + distance + " km. Distance cannot be negative.");
+        }
+        if (emissionFactor < 0) {
+            throw new CalculationException("Invalid CO₂ factor for " + transportMethod + ". Emission factor cannot be negative.");
+        }
+        double co2Emission = (distance * emissionFactor) / 1000;
+
+        if (co2Emission < 0) {
+            throw new CalculationException("Calculated CO2 emission is negative. Check input values.");
+        }
+        return co2Emission;
     }
 }
