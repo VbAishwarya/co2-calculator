@@ -59,7 +59,7 @@ public class ApiService {
 
             if (startCityCoords == null || endCityCoords == null) {
                 logger.error("Error: One or both city coordinates could not be retrieved.");
-                return null;
+                throw new InvalidCityException("Error: One or both city coordinates could not be retrieved.");
             }
 
             DistanceRequestDTO requestDTO = new DistanceRequestDTO(
@@ -100,8 +100,8 @@ public class ApiService {
     }
 
     protected String makeApiPostRequest(String urlString, String jsonBody) throws IOException {
-        int maxRetries = 3; // Maximum number of retries
-        int retryDelay = 2000; // Initial delay in milliseconds (2 seconds)
+        int maxRetries = 3;
+        int retryDelay = 2000;
 
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
@@ -115,11 +115,11 @@ public class ApiService {
 
                 int responseCode = connection.getResponseCode();
 
-                if (responseCode == 504) { // Gateway Timeout
+                if (responseCode == 504) {
                     logger.warn("API request failed with 504 Gateway Timeout. Attempt {}/{}", attempt, maxRetries);
                     if (attempt < maxRetries) {
                         Thread.sleep(retryDelay);
-                        retryDelay *= 2; // double the delay
+                        retryDelay *= 2;
                         continue;
                     }
                 }
@@ -140,7 +140,7 @@ public class ApiService {
                     Thread.sleep(retryDelay);
                     retryDelay *= 2; // Exponential backoff
                 } catch (InterruptedException ignored) {
-                    Thread.currentThread().interrupt(); // Restore interrupted status
+                    Thread.currentThread().interrupt();
                 }
             }
         }

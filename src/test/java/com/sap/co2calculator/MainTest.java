@@ -49,4 +49,45 @@ public class MainTest {
 
         assertEquals("Error: Could not fetch distance.", result);
     }
+
+    @Test
+    void testInvalidCityException() throws ApiRequestException, InvalidCityException, CalculationException {
+        when(apiServiceMock.getDistance("InvalidCity", "New York")).thenThrow(new InvalidCityException("Invalid city name"));
+
+        String[] args = {"--start=InvalidCity", "--end=New York", "--transportation-method=petrol-car-medium"};
+        String result = mainApp.run(args);
+
+        assertEquals("Error: Invalid city name", result);
+    }
+
+    @Test
+    void testApiRequestException() throws ApiRequestException, InvalidCityException, CalculationException {
+        when(apiServiceMock.getDistance("Los Angeles", "New York")).thenThrow(new ApiRequestException("API failed"));
+
+        String[] args = {"--start=Los Angeles", "--end=New York", "--transportation-method=petrol-car-medium"};
+        String result = mainApp.run(args);
+
+        assertEquals("Error: API request failed after retries. API failed", result);
+    }
+
+    @Test
+    void testCalculationException() throws ApiRequestException, InvalidCityException, CalculationException {
+        when(apiServiceMock.getDistance("Los Angeles", "New York")).thenReturn(new DistanceResponseDTO(4500.3));
+        when(co2CalculatorMock.calculateEmission(4500.3, "petrol-car-medium")).thenThrow(new CalculationException("Calculation error"));
+
+        String[] args = {"--start=Los Angeles", "--end=New York", "--transportation-method=petrol-car-medium"};
+        String result = mainApp.run(args);
+
+        assertEquals("Error: Calculation error", result);
+    }
+
+    @Test
+    void testUnexpectedException() throws ApiRequestException, InvalidCityException, CalculationException {
+        when(apiServiceMock.getDistance(anyString(), anyString())).thenThrow(new RuntimeException("Unexpected failure"));
+
+        String[] args = {"--start=Los Angeles", "--end=New York", "--transportation-method=petrol-car-medium"};
+        String result = mainApp.run(args);
+
+        assertEquals("Error: An unexpected error occurred.", result);
+    }
 }
