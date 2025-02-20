@@ -70,9 +70,6 @@ Before running the tool, ensure you have:
    ```bash 
   ./co2-calculator --end "New York" --start "Los Angeles" --transportation-method=electric-car-large
 
-- Option 3: Run Using Linux/macOS Shell Script (co2-calculator.sh)
-   ```bash 
-    ./co2-calculator.sh --end "New York" --start "Los Angeles" --transportation-method petrol-car-medium
   
 ## Running with Docker (Optional)
     
