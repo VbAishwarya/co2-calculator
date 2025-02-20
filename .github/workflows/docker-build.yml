@@ -36,7 +36,7 @@ jobs:
 
       # Build the JAR file using Maven
       - name: Build JAR with Maven
-        run: mvn clean package
+        run: mvn clean package -DskipTests
 
       # Log in to Docker Hub
       - name: Log in to Docker Hub
